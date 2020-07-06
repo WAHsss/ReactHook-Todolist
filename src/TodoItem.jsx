@@ -1,20 +1,16 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 function TodoItem(props) {
     const id = props.data.id;
-    //根据状态选择更改checked
-    function Ischecked(){
-        if(props.data.condition === 'underway'){
-           return <input type="checkbox" onChange={()=>props.change.changeItem(id)}/>
+    useEffect(() => {
+        if (props.data.condition) {
+            document.getElementById(id).style.opacity = 0.5
         }
-
-        return  <input type="checkbox" onChange={()=>props.change.changeItem(id)} checked/>
-        
-    }
+    })
     return (
         <li>
-            <Ischecked/>
+            <input type="checkbox" id={id} onChange={() => props.change({ type: 'changeItem', id })} checked={props.data.condition} />
             <p>{props.data.value}</p>
-            <span onClick={()=>props.change.deleteItem(id)}>-</span>
+            <span onClick={() => props.change({ type: 'deleteItem', id })}>删除</span>
         </li>
     )
 }

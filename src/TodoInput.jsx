@@ -1,22 +1,25 @@
-import React from 'react'
-
-//回车后记录TodoList
-function handleKeyDown(e, props) {
-    let evt = e || window.event;
-    let node = evt.target || evt.srcElement;
-    if (evt.keyCode === 13) {
-        props.changeList(node.value)
-        node.value=''
-        node.focus()
-    }
-}
+import React, { useEffect } from 'react'
 
 export default function TodoInput(props) {
+    let node;
+    useEffect(()=>{
+        node = document.querySelector('input');
+        node.value = ''
+        node.focus()
+    })
+    function handleSubmit(e) {
+        if(node.value !== ''){
+            props.addItem(node.value)
+        }
+        e.preventDefault();
+    }
     return (
         <header>
             <section>
-                <label>TodoList</label>
-                <input type="text" placeholder="请添加事项" onKeyDown={(e) => handleKeyDown(e, props)} />
+                <form onSubmit={handleSubmit}>
+                    <label>TodoList</label>
+                    <input type="text" placeholder="请添加事项" required="required" />
+                </form>
             </section>
         </header>
     )
