@@ -3,7 +3,7 @@ import TodoItem from './TodoItem'
 
 function TodoList(props) {
     const list = props.data.list;
-
+    //根据每个item返回的修改方法type，调用父组件传过来的函数
     function handleChange({type,id}){
         props.change[type](id,list)
     }

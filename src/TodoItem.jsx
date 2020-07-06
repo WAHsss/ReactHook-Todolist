@@ -10,7 +10,7 @@ function TodoItem(props) {
         <li>
             <input type="checkbox" id={id} onChange={() => props.change({ type: 'changeItem', id })} checked={props.data.condition} />
             <p>{props.data.value}</p>
-            <span onClick={() => props.change({ type: 'deleteItem', id })}>删除</span>
+    <span onClick={() => props.change({ type: 'deleteItem', id })}>删除</span>
         </li>
     )
 }

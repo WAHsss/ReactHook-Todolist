@@ -3,11 +3,10 @@ import TodoList from './TodoList.jsx'
 import TodoInput from './TodoInput.jsx'
 import './css/todolist.css'
 function App() {
+    //状态过滤
     const [underwayList, setUnderwayList] = useState([])
     const [doneList, setDoneList] = useState([])
-    //状态过滤
-    //正在进行和未完成的数量和数组
-    let deleteList = []
+    const [deleteList , setDeleteList] = useState([])
     //添加新项目
     function addItem(value) {
         underwayList.push({
@@ -26,11 +25,11 @@ function App() {
         })
         return i;
     }
-    //删除项目
+    //把item放入回收站
     function deleteItem(id, list) {
         let index = findItemIndex(id, list)
-        deleteList.push(list[index])
-        list.splice(list[index], 1)
+        //把删除的元素添加到deleteList
+        setDeleteList(deleteList.concat(list.splice(list[index], 1)))
         setUnderwayList([...underwayList])
         setDoneList([...doneList])
     }
@@ -44,11 +43,26 @@ function App() {
         setUnderwayList([...underwayList])
         setDoneList([...doneList])
     }
+    //删除回收站的内容
+    function removeItem(){
+
+    }
+    //全选回收站的内容
+    function seleteAll(){
+        
+    }
+    //恢复回收站的内容
+    function recoverItem(){
+        // deleteList.forEach((ele , index)=>{
+        //     ele.condition ? doneList.push(ele) : underwayList.push(ele)
+        // })
+    }
     return (
         <>
             <TodoInput addItem={addItem} />
             <TodoList data={{ list: underwayList }} change={{ deleteItem, changeItem }} name="正在进行" />
             <TodoList data={{ list: doneList }} change={{ deleteItem, changeItem }} name="已经完成" />
+            <TodoList data={{ list: deleteList }} change={{ deleteItem, changeItem }} name="回收站" />
         </>
     )
 }
