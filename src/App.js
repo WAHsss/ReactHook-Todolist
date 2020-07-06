@@ -1,26 +1,47 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useState } from 'react'
+import TodoList from './TodoList.jsx'
+import TodoInput from './TodoInput.jsx'
+import './css/todolist.css'
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [list, setlist] = useState([]);
+    //添加新项目
+    function changeList(value) {
+        list.push({
+            id: parseInt(Math.random()*1000),
+            condition: 'underway',
+            value
+        })
+        setlist([...list])
+    }
+    //找到要项目修改的索引
+    function findItemIndex(id){
+        let i;
+        list.forEach((value, index) => {
+            if (value.id === id)
+                i = index
+        })
+        return i;
+    }
+    //删除项目
+    function deleteItem(id) {
+        list.splice(findItemIndex(id),1)
+        setlist([...list])
+    }
+    //修改项目的状态
+    function changeItem(id){
+        let item = list[findItemIndex(id)]
+        if(item.condition ==='underway'){
+            item.condition = 'done'
+        }else{
+            item.condition = 'underway'
+        }
+        setlist([...list])
+    }
+    return (
+        <>
+            <TodoInput changeList={changeList} />
+            <TodoList data={list} change={{deleteItem,changeItem}}/>
+        </>
+    )
 }
-
-export default App;
+export default App
