@@ -1,15 +1,14 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 export default function TodoInput(props) {
-    let node;
-    useEffect(()=>{
-        node = document.querySelector('input');
-        node.value = ''
-        node.focus()
-    })
     function handleSubmit(e) {
+        let target = e.target || e.srcElement;
+        console.log(target.children)
+        let node = target.children[1]
         if(node.value !== ''){
             props.addItem(node.value)
+            node.value = ''
+            node.focus()
         }
         e.preventDefault();
     }
