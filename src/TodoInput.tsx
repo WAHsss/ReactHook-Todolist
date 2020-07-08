@@ -1,6 +1,7 @@
 import React from 'react'
 
 export default function TodoInput(props:any) {
+    //每次回车提交数据，清空输入框
     function handleSubmit(e:any) {
         let target = e.target || e.srcElement;
         let node = target.children[1]

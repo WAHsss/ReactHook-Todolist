@@ -3,7 +3,11 @@ function TodoItem(props:any) {
     const id = props.data.id;
     function ChooseButton(){
         if(props.listType !== 'recycle'){
-            return <span onClick={() => props.change({ fnType: 'deleteItem', id })}>删除</span>
+            return (
+                <span 
+                    onClick={() => props.change({ fnType: 'deleteItem', id })}
+                >删除</span>
+            )
         }
         return (
             <input

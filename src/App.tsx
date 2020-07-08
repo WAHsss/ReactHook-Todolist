@@ -1,113 +1,178 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import TodoList from './TodoList'
 import TodoInput from './TodoInput'
 import Footer from './Footer'
 
-import './css/todolist.css'
+import Store from './util/store'
 
+import './style/todolist.scss'
+
+type listItem = {
+    id: number;
+    condition: boolean;
+    value: string
+}
+interface StringArray {
+    [index: string]: any;
+}
 function App() {
-    type listItem = {
-        id:number;
-        condition : boolean;
-        value:string
-    }
     //状态过滤
     const [underwayList, setUnderwayList] = useState<listItem[]>([])
     const [doneList, setDoneList] = useState<listItem[]>([])
     const [deleteList, setDeleteList] = useState<listItem[]>([])
     const [checkList, setCheckList] = useState<number[]>([])
-    //添加新项目
+    //将字符串与对应的set方法对应
+    const config: StringArray = {
+        'underwayList': {
+            fn: setUnderwayList,
+            list: underwayList
+        },
+        'deleteList': {
+            fn: setDeleteList,
+            list: deleteList
+        },
+        'doneList': {
+            fn: setDoneList,
+            list: doneList
+        },
+        'checkList': {
+            fn: setCheckList,
+            list: checkList
+        }
+    }
+    //const keys = ['underwayList','deleteList','doneList','checkList']
+    useEffect(() => {
+        //从本地取出数据，更新每个state
+        // setCheckList(Store.get('checkList'))
+        // setDeleteList(Store.get('deleteList'))
+        // setDoneList(Store.get('doneList'))
+        // setUnderwayList(Store.get('underwayList'))
+        for(let keys in config){
+            config[keys].fn(Store.get(keys))
+        }
+    }, []);
+    /**根据传入的字符串数组，自动化更新state和本地数据
+     * @method setNewState
+     * @param names:string[]
+     */
+    function setNewState(names: string[]) {
+        names.forEach((ele: string, index: number) => {
+            let item = config[ele]
+            //调用list对应的set函数
+            item.fn([...item.list])
+            Store.set(ele, item.list)
+        })
+    }
+    /**添加新项目
+     * @method addItem
+     * @param value 
+     */
     function addItem(value: string): void {
         underwayList.push({
             id: Math.floor(Math.random() * 1000),
             condition: false,
             value
         });
-        setUnderwayList([...underwayList])
+        setNewState(['underwayList'])
     }
-    //找到要项目修改的索引
-    function findItemIndex(id:number, list:listItem[]):number {
-        let i:number= -1;
-        list.forEach((value:listItem, index:number) => {
-            if (value.id === id){
-                i = index
-            }
-        })
-        return i;
+    /**找到项目修改的索引
+     * @method findItemIndex
+     * @param id 
+     * @param list 要查询的数组
+     */
+    function findItemIndex(id: number, list: listItem[]): number {
+        //使用findIndex减少判断的次数
+        return list.findIndex((value: listItem, index: number) => value.id === id)
     }
-    //把item放入回收站
-    function deleteItem(id:number, list:listItem[]) {
-        let index:number = findItemIndex(id, list)
+    /**把item放入回收站
+     * @method deleteItem
+     * @param id 
+     * @param list underwayList | deleteList
+     */
+    function deleteItem(id: number, list: listItem[]) {
+        let index: number = findItemIndex(id, list)
         //把删除的元素添加到deleteList
-        setDeleteList(deleteList.concat(list.splice(index, 1)))
-        setUnderwayList([...underwayList])
-        setDoneList([...doneList])
+        deleteList.push(list.splice(index, 1)[0])
+        setNewState(['deleteList', 'underwayList', 'doneList'])
     }
-    //修改item的状态,首先找到索引，然后修改完成状态，修改item
-    function changeItem(id:number, list:listItem[]) {
-        let index:number = findItemIndex(id, list);
-        let item:listItem = list[index]
+    /**修改item完成的状态
+     * @method changeItem 首先修改condition，然后删除原来数组中的item并加入到对应的数组
+     * @param id 
+     * @param list 
+     */
+    function changeItem(id: number, list: listItem[]) {
+        let index: number = findItemIndex(id, list);
+        let item: listItem = list[index]
         item.condition = !item.condition
-        list.splice(index, 1);
+        list.splice(index, 1)
         item.condition ? doneList.push(item) : underwayList.push(item)
-        setUnderwayList([...underwayList])
-        setDoneList([...doneList])
+        setNewState(['underwayList', 'doneList'])
     }
     /**删除回收站被选中的数组
     *@method removeItem 
-    *@for 无
-    *@param {rfList} 回收站选中的item列表，[id1,id2,...] *
-    *@returns {void}
     */
-    function removeItem():void {
-        checkList.forEach((id:number, index:number) => {
+    function removeItem(): void {
+        checkList.forEach((id: number, index: number) => {
             deleteList.splice(findItemIndex(id, deleteList), 1)
         })
-        setCheckList([])
-        setDeleteList([...deleteList])
+        //需要清空checkList
+        checkList.length = 0
+        setNewState(['checkList', 'deleteList'])
     }
-    /**修改回收站的选中的内容
+    /**修改回收站里选中的内容
      * @method changeCheckList
-     * @for 无
      * @param {id} 被选中的id
-     * @returns {void}
      */
-    function changeCheckList(id:number):void {
-        let index:number = checkList.indexOf(id) as number
+    function changeCheckList(id: number): void {
+        let index: number = checkList.indexOf(id)
         if (index === -1) {
             checkList.push(id)
         } else {
             checkList.splice(index, 1)
         }
-        setCheckList([...checkList])
+        setNewState(['checkList'])
     }
     /** 恢复回收站中被选中的内容
      * @method recoverItem
-     * @for 无
-     * @param {rcList} 回收站中选中的item列表, [id1,id2,...] *
-     * @returns {void}
      */
-    function recoverItem():void {
-        checkList.forEach((id:number, index:number) => {
-            let delIndex:number = findItemIndex(id, deleteList)
+    function recoverItem(): void {
+        checkList.forEach((id: number, index: number) => {
+            let delIndex: number = findItemIndex(id, deleteList)
             if (deleteList[delIndex].condition) {
                 doneList.push(deleteList.splice(delIndex, 1)[0])
             } else {
                 underwayList.push(deleteList.splice(delIndex, 1)[0])
             }
         })
-        setCheckList([])
-        setDeleteList([...deleteList])
-        setDoneList([...doneList])
-        setUnderwayList([...underwayList])
+        //清空checkList
+        checkList.length = 0
+        setNewState(['underwayList', 'doneList', 'deleteList', 'checkList'])
     }
     return (
         <>
             <TodoInput addItem={addItem} />
-            <TodoList data={{ list: underwayList }} listType='underway' change={{ deleteItem, changeItem }} name="正在进行" />
-            <TodoList data={{ list: doneList }} listType='done' change={{ deleteItem, changeItem }} name="已经完成" />
-            <TodoList data={{ list: deleteList, checkList }} listType='recycle' change={{ changeCheckList }} name="回收站" />
-            <Footer change={{ removeItem, recoverItem }} usable={checkList.length} />
+            <TodoList
+                data={{ list: underwayList }}
+                listType='underway'
+                change={{ deleteItem, changeItem }}
+                name="正在进行"
+            />
+            <TodoList
+                data={{ list: doneList }}
+                listType='done'
+                change={{ deleteItem, changeItem }}
+                name="已经完成"
+            />
+            <TodoList
+                data={{ list: deleteList, checkList }}
+                listType='recycle'
+                change={{ changeCheckList }}
+                name="回收站"
+            />
+            <Footer
+                change={{ removeItem, recoverItem }}
+                usable={checkList.length}
+            />
         </>
     )
 }
