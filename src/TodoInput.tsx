@@ -1,9 +1,8 @@
 import React from 'react'
 
-export default function TodoInput(props) {
-    function handleSubmit(e) {
+export default function TodoInput(props:any) {
+    function handleSubmit(e:any) {
         let target = e.target || e.srcElement;
-        console.log(target.children)
         let node = target.children[1]
         if(node.value !== ''){
             props.addItem(node.value)
@@ -17,7 +16,7 @@ export default function TodoInput(props) {
             <section>
                 <form onSubmit={handleSubmit}>
                     <label>TodoList</label>
-                    <input type="text" placeholder="请添加事项" required="required" />
+                    <input type="text" placeholder="请添加事项" required={true}/>
                 </form>
             </section>
         </header>

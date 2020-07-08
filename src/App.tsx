@@ -6,46 +6,47 @@ import Footer from './Footer'
 import './css/todolist.css'
 
 function App() {
-    //状态过滤
-    const [underwayList, setUnderwayList] = useState([])
-    const [doneList, setDoneList] = useState([])
-    const [deleteList, setDeleteList] = useState([])
-    const [checkList, setCheckList] = useState([])
-    //添加新项目
-    type newItem = {
+    type listItem = {
         id:number;
         condition : boolean;
         value:string
     }
+    //状态过滤
+    const [underwayList, setUnderwayList] = useState<listItem[]>([])
+    const [doneList, setDoneList] = useState<listItem[]>([])
+    const [deleteList, setDeleteList] = useState<listItem[]>([])
+    const [checkList, setCheckList] = useState<number[]>([])
+    //添加新项目
     function addItem(value: string): void {
         underwayList.push({
-            id: parseInt(Math.random() * 1000),
+            id: Math.floor(Math.random() * 1000),
             condition: false,
             value
-        })
+        });
         setUnderwayList([...underwayList])
     }
     //找到要项目修改的索引
-    function findItemIndex(id, list) {
-        let i;
-        list.forEach((value, index) => {
-            if (value.id === id)
+    function findItemIndex(id:number, list:listItem[]):number {
+        let i:number= -1;
+        list.forEach((value:listItem, index:number) => {
+            if (value.id === id){
                 i = index
+            }
         })
         return i;
     }
     //把item放入回收站
-    function deleteItem(id, list) {
-        let index = findItemIndex(id, list)
+    function deleteItem(id:number, list:listItem[]) {
+        let index:number = findItemIndex(id, list)
         //把删除的元素添加到deleteList
-        setDeleteList(deleteList.concat(list.splice(list[index], 1)))
+        setDeleteList(deleteList.concat(list.splice(index, 1)))
         setUnderwayList([...underwayList])
         setDoneList([...doneList])
     }
     //修改item的状态,首先找到索引，然后修改完成状态，修改item
-    function changeItem(id, list) {
-        let index = findItemIndex(id, list);
-        let item = list[index]
+    function changeItem(id:number, list:listItem[]) {
+        let index:number = findItemIndex(id, list);
+        let item:listItem = list[index]
         item.condition = !item.condition
         list.splice(index, 1);
         item.condition ? doneList.push(item) : underwayList.push(item)
@@ -58,9 +59,9 @@ function App() {
     *@param {rfList} 回收站选中的item列表，[id1,id2,...] *
     *@returns {void}
     */
-    function removeItem(checkList) {
-        checkList.forEach((ele, index) => {
-            deleteList.splice(findItemIndex(ele, deleteList), 1)
+    function removeItem():void {
+        checkList.forEach((id:number, index:number) => {
+            deleteList.splice(findItemIndex(id, deleteList), 1)
         })
         setCheckList([])
         setDeleteList([...deleteList])
@@ -71,14 +72,13 @@ function App() {
      * @param {id} 被选中的id
      * @returns {void}
      */
-    function changeCheckList(id) {
-        let index = checkList.indexOf(id)
+    function changeCheckList(id:number):void {
+        let index:number = checkList.indexOf(id) as number
         if (index === -1) {
             checkList.push(id)
         } else {
             checkList.splice(index, 1)
         }
-        console.log(checkList)
         setCheckList([...checkList])
     }
     /** 恢复回收站中被选中的内容
@@ -87,13 +87,13 @@ function App() {
      * @param {rcList} 回收站中选中的item列表, [id1,id2,...] *
      * @returns {void}
      */
-    function recoverItem() {
-        checkList.forEach((ele, index) => {
-            let delIndex = findItemIndex(ele, deleteList)
+    function recoverItem():void {
+        checkList.forEach((id:number, index:number) => {
+            let delIndex:number = findItemIndex(id, deleteList)
             if (deleteList[delIndex].condition) {
-                doneList.concat(deleteList.splice(delIndex, 1))
+                doneList.push(deleteList.splice(delIndex, 1)[0])
             } else {
-                underwayList.concat(deleteList.splice(delIndex, 1))
+                underwayList.push(deleteList.splice(delIndex, 1)[0])
             }
         })
         setCheckList([])
