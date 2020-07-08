@@ -4,11 +4,11 @@ import React from 'react'
     return(
         <footer>
             <button 
-                onClick={props.change.recoverItem} 
+                onClick={props.recoverItem} 
                 className={props.usable === 0 ? 'disabled':''}
             >恢复</button>
             <button 
-                onClick={props.change.removeItem} 
+                onClick={props.removeItem} 
                 className={props.usable === 0 ? 'disabled':''}
             >删除</button>
         </footer>

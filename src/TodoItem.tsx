@@ -5,7 +5,7 @@ function TodoItem(props:any) {
         if(props.listType !== 'recycle'){
             return (
                 <span 
-                    onClick={() => props.change({ fnType: 'deleteItem', id })}
+                    onClick={() => props.change({ fnType: 'changeDeleteItem', id })}
                 >删除</span>
             )
         }
@@ -25,7 +25,7 @@ function TodoItem(props:any) {
                 type='checkbox'
                 className='done-underway-check'
                 style={props.listType==='recycle' ? {cursor: 'not-allowed'}:{}}
-                onChange={() => props.change({ fnType: 'changeItem', id })}
+                onChange={() => props.change({ fnType: 'changeActionItem', id })}
                 checked={props.data.condition}
             />
             <p>{props.data.value}</p>

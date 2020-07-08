@@ -47,7 +47,7 @@ function App() {
         // setDeleteList(Store.get('deleteList'))
         // setDoneList(Store.get('doneList'))
         // setUnderwayList(Store.get('underwayList'))
-        for(let keys in config){
+        for (let keys in config) {
             config[keys].fn(Store.get(keys))
         }
     }, []);
@@ -55,13 +55,11 @@ function App() {
      * @method setNewState
      * @param names:string[]
      */
-    function setNewState(names: string[]) {
-        names.forEach((ele: string, index: number) => {
-            let item = config[ele]
-            //调用list对应的set函数
-            item.fn([...item.list])
-            Store.set(ele, item.list)
-        })
+    function setNewState(name: string) {
+        let item = config[name]
+        //调用list对应的set函数
+        item.fn([...item.list])
+        Store.set(name, item.list)
     }
     /**添加新项目
      * @method addItem
@@ -73,7 +71,7 @@ function App() {
             condition: false,
             value
         });
-        setNewState(['underwayList'])
+        setNewState('underwayList')
     }
     /**找到项目修改的索引
      * @method findItemIndex
@@ -85,28 +83,31 @@ function App() {
         return list.findIndex((value: listItem, index: number) => value.id === id)
     }
     /**把item放入回收站
-     * @method deleteItem
+     * @method changeDeleteItem
      * @param id 
      * @param list underwayList | deleteList
      */
-    function deleteItem(id: number, list: listItem[]) {
+    function changeDeleteItem(id: number, list: listItem[]) {
         let index: number = findItemIndex(id, list)
         //把删除的元素添加到deleteList
         deleteList.push(list.splice(index, 1)[0])
-        setNewState(['deleteList', 'underwayList', 'doneList'])
+        setNewState('deleteList')
+        setNewState('underwayList')
+        setNewState('doneList')
     }
     /**修改item完成的状态
-     * @method changeItem 首先修改condition，然后删除原来数组中的item并加入到对应的数组
+     * @method changeActionItem 首先修改condition，然后删除原来数组中的item并加入到对应的数组
      * @param id 
      * @param list 
      */
-    function changeItem(id: number, list: listItem[]) {
+    function changeActionItem(id: number, list: listItem[]) {
         let index: number = findItemIndex(id, list);
         let item: listItem = list[index]
         item.condition = !item.condition
         list.splice(index, 1)
         item.condition ? doneList.push(item) : underwayList.push(item)
-        setNewState(['underwayList', 'doneList'])
+        setNewState('underwayList')
+        setNewState('doneList')
     }
     /**删除回收站被选中的数组
     *@method removeItem 
@@ -117,7 +118,8 @@ function App() {
         })
         //需要清空checkList
         checkList.length = 0
-        setNewState(['checkList', 'deleteList'])
+        setNewState('checkList')
+        setNewState('deleteList')
     }
     /**修改回收站里选中的内容
      * @method changeCheckList
@@ -130,7 +132,7 @@ function App() {
         } else {
             checkList.splice(index, 1)
         }
-        setNewState(['checkList'])
+        setNewState('checkList')
     }
     /** 恢复回收站中被选中的内容
      * @method recoverItem
@@ -146,7 +148,10 @@ function App() {
         })
         //清空checkList
         checkList.length = 0
-        setNewState(['underwayList', 'doneList', 'deleteList', 'checkList'])
+        setNewState('underwayList')
+        setNewState('doneList')
+        setNewState('deleteList')
+        setNewState('checkList')
     }
     return (
         <>
@@ -154,23 +159,26 @@ function App() {
             <TodoList
                 data={{ list: underwayList }}
                 listType='underway'
-                change={{ deleteItem, changeItem }}
+                changeActionItem={changeActionItem}
+                changeDeleteItem={changeDeleteItem}
                 name="正在进行"
             />
             <TodoList
                 data={{ list: doneList }}
                 listType='done'
-                change={{ deleteItem, changeItem }}
+                changeDeleteItem={changeDeleteItem}
+                changeActionItem={changeActionItem}
                 name="已经完成"
             />
             <TodoList
                 data={{ list: deleteList, checkList }}
                 listType='recycle'
-                change={{ changeCheckList }}
+                changeCheckList={changeCheckList}
                 name="回收站"
             />
             <Footer
-                change={{ removeItem, recoverItem }}
+                removeItem={removeItem}
+                recoverItem={recoverItem}
                 usable={checkList.length}
             />
         </>

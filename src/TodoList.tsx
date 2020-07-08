@@ -6,8 +6,8 @@ function TodoList(props: any) {
     const checkList = props.data.checkList
     //根据每个item返回的修改方法type，调用父组件传过来的函数
     function handleChange({ fnType, id }: { fnType: string, id: number }): void {
-        if (!props.change[fnType]) return
-        props.change[fnType](id, list)
+        if (!props[fnType]) return
+        props[fnType](id, list)
     }
     return (
         <>

@@ -1,11 +1,11 @@
-import React from 'react'
+import React,{useRef} from 'react'
 
-export default function TodoInput(props:any) {
+export default function TodoInput(props: any) {
     //每次回车提交数据，清空输入框
+    const inputRef= useRef(null);
     function handleSubmit(e:any) {
-        let target = e.target || e.srcElement;
-        let node = target.children[1]
-        if(node.value !== ''){
+        let node:any  = inputRef.current
+        if (node.value !== '') {
             props.addItem(node.value)
             node.value = ''
             node.focus()
@@ -17,7 +17,12 @@ export default function TodoInput(props:any) {
             <section>
                 <form onSubmit={handleSubmit}>
                     <label>TodoList</label>
-                    <input type="text" placeholder="请添加事项" required={true}/>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        placeholder="请添加事项"
+                        required={true}
+                    />
                 </form>
             </section>
         </header>
