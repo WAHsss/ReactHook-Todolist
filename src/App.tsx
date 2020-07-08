@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import TodoList from './TodoList.jsx'
-import TodoInput from './TodoInput.jsx'
+import TodoList from './TodoList'
+import TodoInput from './TodoInput'
 import Footer from './Footer'
 
 import './css/todolist.css'
@@ -12,7 +12,12 @@ function App() {
     const [deleteList, setDeleteList] = useState([])
     const [checkList, setCheckList] = useState([])
     //添加新项目
-    function addItem(value) {
+    type newItem = {
+        id:number;
+        condition : boolean;
+        value:string
+    }
+    function addItem(value: string): void {
         underwayList.push({
             id: parseInt(Math.random() * 1000),
             condition: false,
@@ -71,7 +76,7 @@ function App() {
         if (index === -1) {
             checkList.push(id)
         } else {
-            checkList.splice(index , 1)
+            checkList.splice(index, 1)
         }
         console.log(checkList)
         setCheckList([...checkList])
@@ -99,10 +104,10 @@ function App() {
     return (
         <>
             <TodoInput addItem={addItem} />
-            <TodoList data={{ list: underwayList }} type='underway' change={{ deleteItem, changeItem }} name="正在进行" />
-            <TodoList data={{ list: doneList }} type='done' change={{ deleteItem, changeItem }} name="已经完成" />
-            <TodoList data={{ list: deleteList, checkList }} type='recycle' change={{ changeCheckList }} name="回收站" />
-            <Footer change={{removeItem,recoverItem}} usable={checkList.length}/>
+            <TodoList data={{ list: underwayList }} listType='underway' change={{ deleteItem, changeItem }} name="正在进行" />
+            <TodoList data={{ list: doneList }} listType='done' change={{ deleteItem, changeItem }} name="已经完成" />
+            <TodoList data={{ list: deleteList, checkList }} listType='recycle' change={{ changeCheckList }} name="回收站" />
+            <Footer change={{ removeItem, recoverItem }} usable={checkList.length} />
         </>
     )
 }
